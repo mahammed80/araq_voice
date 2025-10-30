@@ -25,11 +25,7 @@ export default async function ComponentsLayout({ children }: { children: React.R
               <a href="https://motion.dev" className="underline underline-offset-2">
                 Motion
               </a>
-              , and{' '}
-              <span className="font-semibold">
-                AraQ
-              </span>
-              .
+              , and <span className="font-semibold">AraQ</span>.
             </p>
             <p className="text-foreground max-w-prose text-balance">Open Source.</p>
           </header>

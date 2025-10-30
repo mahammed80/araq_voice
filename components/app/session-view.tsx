@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { type Variants, motion } from 'motion/react';
 import type { AppConfig } from '@/app-config';
 import { ChatTranscript } from '@/components/app/chat-transcript';
 import { PreConnectMessage } from '@/components/app/preconnect-message';
@@ -19,25 +19,32 @@ import { ScrollArea } from '../livekit/scroll-area/scroll-area';
 const MotionBottom = motion.create('div');
 
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
-const BOTTOM_VIEW_MOTION_PROPS = {
-  variants: {
-    visible: {
-      opacity: 1,
-      translateY: '0%',
-    },
-    hidden: {
-      opacity: 0,
-      translateY: '100%',
+
+const bottomVariants: Variants = {
+  visible: {
+    opacity: 1,
+    translateY: '0%',
+    transition: {
+      duration: 0.3,
+      delay: 0.5,
+      ease: 'easeOut',
     },
   },
+  hidden: {
+    opacity: 0,
+    translateY: '100%',
+    transition: {
+      duration: 0.3,
+      ease: 'easeOut',
+    },
+  },
+};
+
+const BOTTOM_VIEW_MOTION_PROPS = {
+  variants: bottomVariants,
   initial: 'hidden',
   animate: 'visible',
   exit: 'hidden',
-  transition: {
-    duration: 0.3,
-    delay: 0.5,
-    ease: 'easeOut',
-  },
 };
 
 interface FadeProps {
