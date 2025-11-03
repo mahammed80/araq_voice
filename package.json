@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production NODE_PORT=3001 node server.js",
+    "custom": "node server.js",
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
