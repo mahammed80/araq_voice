@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button } from '@/components/livekit/button';
 import { RAGConfig } from '@/components/app/rag-config';
 import { useSession } from '@/components/app/session-provider';
+import { Button } from '@/components/livekit/button';
 
 function WelcomeImage() {
   return (
@@ -36,21 +36,21 @@ export const WelcomeView = ({
 
   return (
     <div ref={ref}>
-      <section className="bg-background flex flex-col items-center justify-center text-center px-4">
+      <section className="bg-background flex flex-col items-center justify-center px-4 text-center">
         <WelcomeImage />
 
         <p className="text-foreground max-w-prose pt-1 leading-6 font-medium">
           Chat live with your voice AI agent
         </p>
 
-        <div className="mt-6 space-y-3 w-full max-w-md">
+        <div className="mt-6 w-full max-w-md space-y-3">
           <Button variant="primary" size="lg" onClick={onStartCall} className="w-full font-mono">
             {startButtonText}
           </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
+
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setShowRAGConfig(!showRAGConfig)}
             className="w-full"
           >
@@ -59,10 +59,7 @@ export const WelcomeView = ({
 
           {showRAGConfig && (
             <div className="mt-4 w-full max-w-2xl">
-              <RAGConfig 
-                ragConfig={appConfig.ragConfig} 
-                onConfigChange={updateRAGConfig}
-              />
+              <RAGConfig ragConfig={appConfig.ragConfig} onConfigChange={updateRAGConfig} />
             </div>
           )}
         </div>

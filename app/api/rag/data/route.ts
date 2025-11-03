@@ -1,19 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { RAGStorage } from '@/lib/rag-storage';
-import type { RAGDataEntryInput } from '@/types/rag-data';
+import type { RAGDataCategory, RAGDataEntryInput } from '@/types/rag-data';
+
+const VALID_CATEGORIES: RAGDataCategory[] = ['product', 'service', 'pricing', 'company', 'other'];
 
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
-    const category = searchParams.get('category');
+    const categoryParam = searchParams.get('category');
     const search = searchParams.get('search');
 
     let entries;
 
     if (search) {
       entries = RAGStorage.searchEntries(search);
-    } else if (category) {
-      entries = RAGStorage.getEntriesByCategory(category);
+    } else if (categoryParam) {
+      // Validate category parameter
+      const category: RAGDataCategory | undefined = VALID_CATEGORIES.includes(
+        categoryParam as RAGDataCategory
+      )
+        ? (categoryParam as RAGDataCategory)
+        : undefined;
+
+      if (category) {
+        entries = RAGStorage.getEntriesByCategory(category);
+      } else {
+        return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
+      }
     } else {
       entries = RAGStorage.getAllEntries();
     }

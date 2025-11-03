@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { RoomContext } from '@livekit/components-react';
 import { APP_CONFIG_DEFAULTS, type AppConfig } from '@/app-config';
 import { useRoom } from '@/hooks/useRoom';
@@ -24,19 +24,25 @@ interface SessionProviderProps {
   children: React.ReactNode;
 }
 
-export const SessionProvider = ({ appConfig: initialAppConfig, children }: SessionProviderProps) => {
+export const SessionProvider = ({
+  appConfig: initialAppConfig,
+  children,
+}: SessionProviderProps) => {
   const [ragConfig, setRAGConfig] = useState<AppConfig['ragConfig']>(initialAppConfig.ragConfig);
-  
+
   const appConfig = useMemo(
     () => ({ ...initialAppConfig, ragConfig }),
     [initialAppConfig, ragConfig]
   );
 
   const { room, isSessionActive, startSession, endSession } = useRoom(appConfig);
-  
-  const updateRAGConfig = (newRAGConfig: AppConfig['ragConfig']) => {
-    setRAGConfig(newRAGConfig);
-  };
+
+  const updateRAGConfig = useCallback(
+    (newRAGConfig: AppConfig['ragConfig']) => {
+      setRAGConfig(newRAGConfig);
+    },
+    []
+  );
 
   const contextValue = useMemo(
     () => ({ appConfig, isSessionActive, startSession, endSession, updateRAGConfig }),

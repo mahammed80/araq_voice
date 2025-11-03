@@ -1,7 +1,7 @@
 'use client';
 
-import { ChatMessage } from './chatbot';
 import { cn } from '@/lib/utils';
+import { ChatMessage } from './chatbot';
 
 interface ChatMessagesProps {
   messages: ChatMessage[];
@@ -12,14 +12,14 @@ interface ChatMessagesProps {
 export function ChatMessages({ messages, streamingContent, isLoading }: ChatMessagesProps) {
   if (messages.length === 0) {
     return (
-        <div className="flex h-full items-center justify-center">
-          <div className="text-center space-y-4">
-            <p className="text-muted-foreground text-lg">ابدأ محادثة مع مساعد AI</p>
-            <p className="text-muted-foreground text-sm">
-              اسأل أي شيء واحصل على إجابات فورية بالعربية
-            </p>
-          </div>
+      <div className="flex h-full items-center justify-center">
+        <div className="space-y-4 text-center">
+          <p className="text-muted-foreground text-lg">ابدأ محادثة مع مساعد AI</p>
+          <p className="text-muted-foreground text-sm">
+            اسأل أي شيء واحصل على إجابات فورية بالعربية
+          </p>
         </div>
+      </div>
     );
   }
 
@@ -28,10 +28,7 @@ export function ChatMessages({ messages, streamingContent, isLoading }: ChatMess
       {messages.map((message) => (
         <div
           key={message.id}
-          className={cn(
-            'flex gap-3',
-            message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-          )}
+          className={cn('flex gap-3', message.role === 'user' ? 'flex-row-reverse' : 'flex-row')}
         >
           {/* Avatar */}
           <div
@@ -54,11 +51,12 @@ export function ChatMessages({ messages, streamingContent, isLoading }: ChatMess
                 : 'bg-muted text-foreground mr-auto max-w-[80%]'
             )}
           >
-            <div className="whitespace-pre-wrap break-words">
-              {message.content || (isLoading && message.role === 'assistant' ? streamingContent : '')}
+            <div className="break-words whitespace-pre-wrap">
+              {message.content ||
+                (isLoading && message.role === 'assistant' ? streamingContent : '')}
             </div>
             {isLoading && message.role === 'assistant' && message.content && streamingContent && (
-              <span className="inline-block ml-1 animate-pulse">▋</span>
+              <span className="ml-1 inline-block animate-pulse">▋</span>
             )}
           </div>
         </div>
@@ -66,4 +64,3 @@ export function ChatMessages({ messages, streamingContent, isLoading }: ChatMess
     </div>
   );
 }
-

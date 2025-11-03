@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ChatMessages } from '@/components/chatbot/chat-messages';
 import { ChatInput } from '@/components/chatbot/chat-input';
+import { ChatMessages } from '@/components/chatbot/chat-messages';
 import { ChatSettings } from '@/components/chatbot/chat-settings';
 import { Button } from '@/components/livekit/button';
-import { cn } from '@/lib/utils';
 
 export interface ChatMessage {
   id: string;
@@ -135,13 +134,11 @@ export function ChatBot() {
                 // Update the assistant message
                 setMessages((prev) =>
                   prev.map((msg) =>
-                    msg.id === assistantMessageId
-                      ? { ...msg, content: fullContent }
-                      : msg
+                    msg.id === assistantMessageId ? { ...msg, content: fullContent } : msg
                   )
                 );
               }
-            } catch (e) {
+            } catch {
               // Ignore JSON parse errors
             }
           }
@@ -149,18 +146,19 @@ export function ChatBot() {
       }
 
       setStreamingContent('');
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         console.log('Request aborted');
         // Remove the empty assistant message if aborted
-        setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessageId || msg.content.trim() !== ''));
+        setMessages((prev) =>
+          prev.filter((msg) => msg.id !== assistantMessageId || msg.content.trim() !== '')
+        );
       } else {
         console.error('Error sending message:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to get response';
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === assistantMessageId
-              ? { ...msg, content: `Error: ${error.message || 'Failed to get response'}` }
-              : msg
+            msg.id === assistantMessageId ? { ...msg, content: `Error: ${errorMessage}` } : msg
           )
         );
       }
@@ -194,7 +192,7 @@ export function ChatBot() {
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="hover:text-primary font-mono text-sm font-medium tracking-wider transition-colors text-foreground"
+              className="hover:text-primary text-foreground font-mono text-sm font-medium tracking-wider transition-colors"
             >
               ← Home
             </Link>

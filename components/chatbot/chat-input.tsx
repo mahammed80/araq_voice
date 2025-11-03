@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, KeyboardEvent } from 'react';
+import { KeyboardEvent, useState } from 'react';
 import { Button } from '@/components/livekit/button';
-import { cn } from '@/lib/utils';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -36,7 +35,7 @@ export function ChatInput({ onSend, isLoading, onStop }: ChatInputProps) {
           onKeyDown={handleKeyDown}
           placeholder="اكتب رسالتك... (Enter للإرسال، Shift+Enter لسطر جديد)"
           disabled={isLoading}
-          className="flex-1 resize-none rounded-lg border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+          className="bg-background text-foreground placeholder:text-muted-foreground focus:ring-primary flex-1 resize-none rounded-lg border px-4 py-3 focus:ring-2 focus:outline-none disabled:opacity-50"
           rows={1}
           style={{
             minHeight: '44px',
@@ -61,4 +60,3 @@ export function ChatInput({ onSend, isLoading, onStop }: ChatInputProps) {
     </div>
   );
 }
-

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/livekit/button';
+import { useEffect, useState } from 'react';
 import type { AppConfig } from '@/app-config';
-import type { RAGDataEntry, RAGDataEntryInput, RAGDataCategory } from '@/types/rag-data';
+import { Button } from '@/components/livekit/button';
 import { cn } from '@/lib/utils';
+import type { RAGDataCategory, RAGDataEntry, RAGDataEntryInput } from '@/types/rag-data';
 
 interface RAGConfigProps {
   ragConfig?: AppConfig['ragConfig'];
@@ -25,13 +25,13 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
   const [topK, setTopK] = useState(ragConfig?.topK?.toString() || '5');
   const [activeTab, setActiveTab] = useState<'config' | 'data'>('data');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  
+
   // Data management state
   const [entries, setEntries] = useState<RAGDataEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingEntry, setEditingEntry] = useState<RAGDataEntry | null>(null);
   const [showEntryForm, setShowEntryForm] = useState(false);
-  
+
   // Entry form state
   const [formData, setFormData] = useState<RAGDataEntryInput>({
     category: 'product',
@@ -45,9 +45,8 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
   const fetchEntries = async (category?: string) => {
     setLoading(true);
     try {
-      const url = category && category !== 'all' 
-        ? `/api/rag/data?category=${category}`
-        : '/api/rag/data';
+      const url =
+        category && category !== 'all' ? `/api/rag/data?category=${category}` : '/api/rag/data';
       const res = await fetch(url);
       const data = await res.json();
       setEntries(data.entries || []);
@@ -81,7 +80,7 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
       if (metadataJson.trim()) {
         try {
           metadata = JSON.parse(metadataJson);
-        } catch (e) {
+        } catch {
           alert('Invalid JSON in metadata field');
           return;
         }
@@ -160,9 +159,8 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
     setShowEntryForm(false);
   };
 
-  const filteredEntries = selectedCategory === 'all' 
-    ? entries 
-    : entries.filter((e) => e.category === selectedCategory);
+  const filteredEntries =
+    selectedCategory === 'all' ? entries : entries.filter((e) => e.category === selectedCategory);
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -173,7 +171,7 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
           className={cn(
             'px-4 py-2 text-sm font-medium transition-colors',
             activeTab === 'data'
-              ? 'border-b-2 border-primary text-primary'
+              ? 'border-primary text-primary border-b-2'
               : 'text-muted-foreground hover:text-foreground'
           )}
         >
@@ -184,7 +182,7 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
           className={cn(
             'px-4 py-2 text-sm font-medium transition-colors',
             activeTab === 'config'
-              ? 'border-b-2 border-primary text-primary'
+              ? 'border-primary text-primary border-b-2'
               : 'text-muted-foreground hover:text-foreground'
           )}
         >
@@ -196,12 +194,12 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
       {activeTab === 'data' && (
         <div className="space-y-4">
           {/* Category Filter */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium">Filter:</span>
             <button
               onClick={() => setSelectedCategory('all')}
               className={cn(
-                'px-3 py-1 text-xs rounded-full border transition-colors',
+                'rounded-full border px-3 py-1 text-xs transition-colors',
                 selectedCategory === 'all'
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background hover:bg-muted'
@@ -214,7 +212,7 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
                 key={cat.value}
                 onClick={() => setSelectedCategory(cat.value)}
                 className={cn(
-                  'px-3 py-1 text-xs rounded-full border transition-colors',
+                  'rounded-full border px-3 py-1 text-xs transition-colors',
                   selectedCategory === cat.value
                     ? 'bg-primary text-primary-foreground border-primary'
                     : 'bg-background hover:bg-muted'
@@ -243,11 +241,9 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
 
           {/* Entry Form */}
           {showEntryForm && (
-            <div className="p-4 border rounded-lg bg-muted/30 space-y-4">
+            <div className="bg-muted/30 space-y-4 rounded-lg border p-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold">
-                  {editingEntry ? 'Edit Entry' : 'Add New Entry'}
-                </h4>
+                <h4 className="font-semibold">{editingEntry ? 'Edit Entry' : 'Add New Entry'}</h4>
                 <Button variant="ghost" size="sm" onClick={handleCancelForm}>
                   ✕
                 </Button>
@@ -255,13 +251,13 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Category</label>
+                  <label className="mb-1 block text-sm font-medium">Category</label>
                   <select
                     value={formData.category}
                     onChange={(e) =>
                       setFormData({ ...formData, category: e.target.value as RAGDataCategory })
                     }
-                    className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
+                    className="bg-background text-foreground w-full rounded-md border px-3 py-2"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat.value} value={cat.value}>
@@ -272,7 +268,7 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">
+                  <label className="mb-1 block text-sm font-medium">
                     Title <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -280,12 +276,12 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     placeholder="e.g., Premium Product Package"
-                    className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
+                    className="bg-background text-foreground w-full rounded-md border px-3 py-2"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">
+                  <label className="mb-1 block text-sm font-medium">
                     Content <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -293,15 +289,16 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                     placeholder="Enter detailed information about the product, service, pricing, or company information..."
                     rows={6}
-                    className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
+                    className="bg-background text-foreground w-full rounded-md border px-3 py-2"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    This content will be searchable by the AI agent. Include all relevant details like prices, features, descriptions, etc.
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    This content will be searchable by the AI agent. Include all relevant details
+                    like prices, features, descriptions, etc.
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">
+                  <label className="mb-1 block text-sm font-medium">
                     Additional Metadata (JSON, optional)
                   </label>
                   <textarea
@@ -309,9 +306,9 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
                     onChange={(e) => setMetadataJson(e.target.value)}
                     placeholder='{"price": 99.99, "currency": "USD", "availability": "in-stock"}'
                     rows={3}
-                    className="w-full px-3 py-2 border rounded-md bg-background text-foreground font-mono text-sm"
+                    className="bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     Optional: Add structured metadata like price, currency, availability, etc.
                   </p>
                 </div>
@@ -331,32 +328,31 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
           {/* Entries List */}
           <div className="space-y-2">
             {loading ? (
-              <p className="text-sm text-muted-foreground text-center py-4">Loading...</p>
+              <p className="text-muted-foreground py-4 text-center text-sm">Loading...</p>
             ) : filteredEntries.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">
+              <p className="text-muted-foreground py-4 text-center text-sm">
                 No entries found. Add your first entry to get started!
               </p>
             ) : (
               filteredEntries.map((entry) => (
                 <div
                   key={entry.id}
-                  className="p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors"
+                  className="bg-background hover:bg-muted/50 rounded-lg border p-3 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                          {CATEGORIES.find((c) => c.value === entry.category)?.label || entry.category}
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center gap-2">
+                        <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-medium">
+                          {CATEGORIES.find((c) => c.value === entry.category)?.label ||
+                            entry.category}
                         </span>
-                        <h5 className="font-semibold truncate">{entry.title}</h5>
+                        <h5 className="truncate font-semibold">{entry.title}</h5>
                       </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {entry.content}
-                      </p>
+                      <p className="text-muted-foreground line-clamp-2 text-sm">{entry.content}</p>
                       {entry.metadata && Object.keys(entry.metadata).length > 0 && (
-                        <div className="mt-2 text-xs text-muted-foreground">
+                        <div className="text-muted-foreground mt-2 text-xs">
                           {Object.entries(entry.metadata)
-                            .filter(([_, v]) => v !== null && v !== undefined)
+                            .filter(([, v]) => v !== null && v !== undefined)
                             .map(([key, value]) => (
                               <span key={key} className="mr-3">
                                 <strong>{key}:</strong> {String(value)}
@@ -365,7 +361,7 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-1 shrink-0">
+                    <div className="flex shrink-0 gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -393,10 +389,10 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
 
       {/* Configuration Tab */}
       {activeTab === 'config' && (
-        <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+        <div className="bg-muted/30 space-y-4 rounded-lg border p-4">
           <div className="space-y-3">
             <div>
-              <label htmlFor="collection-name" className="block text-sm font-medium mb-1">
+              <label htmlFor="collection-name" className="mb-1 block text-sm font-medium">
                 Collection Name
               </label>
               <input
@@ -405,15 +401,15 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
                 value={collectionName}
                 onChange={(e) => setCollectionName(e.target.value)}
                 placeholder="e.g., my-rag-collection"
-                className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
+                className="bg-background text-foreground w-full rounded-md border px-3 py-2"
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-muted-foreground mt-1 text-xs">
                 Name for your RAG collection (used by the agent backend)
               </p>
             </div>
 
             <div>
-              <label htmlFor="top-k" className="block text-sm font-medium mb-1">
+              <label htmlFor="top-k" className="mb-1 block text-sm font-medium">
                 Top K Results: {topK}
               </label>
               <input
@@ -425,7 +421,7 @@ export function RAGConfig({ ragConfig, onConfigChange, className }: RAGConfigPro
                 onChange={(e) => setTopK(e.target.value)}
                 className="w-full"
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-muted-foreground mt-1 text-xs">
                 Number of relevant results to retrieve from your knowledge base (1-20)
               </p>
             </div>
