@@ -61,7 +61,7 @@ export const ChatEntry = ({
           messageOrigin === 'local'
             ? 'bg-muted ml-auto'
             : isAgent
-              ? 'bg-primary/10 mr-auto border border-primary/20'
+              ? 'border-primary/20 mr-auto border bg-primary/10'
               : 'bg-muted mr-auto'
         )}
       >
