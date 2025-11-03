@@ -187,14 +187,14 @@ export function ChatBot() {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="bg-background flex h-screen flex-col">
       {/* Header */}
-      <header className="border-b bg-background px-4 py-3">
+      <header className="bg-background border-b px-4 py-3">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="text-foreground font-mono text-sm font-medium tracking-wider hover:text-primary transition-colors"
+              className="hover:text-primary font-mono text-sm font-medium tracking-wider transition-colors text-foreground"
             >
               ← Home
             </Link>
@@ -218,17 +218,17 @@ export function ChatBot() {
         <div className="flex flex-1 flex-col">
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-4">
-            <ChatMessages messages={messages} streamingContent={streamingContent} isLoading={isLoading} />
+            <ChatMessages
+              messages={messages}
+              streamingContent={streamingContent}
+              isLoading={isLoading}
+            />
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
-          <div className="border-t bg-background px-4 py-4">
-            <ChatInput
-              onSend={sendMessage}
-              isLoading={isLoading}
-              onStop={stopGeneration}
-            />
+          <div className="bg-background border-t px-4 py-4">
+            <ChatInput onSend={sendMessage} isLoading={isLoading} onStop={stopGeneration} />
           </div>
         </div>
 
@@ -237,12 +237,12 @@ export function ChatBot() {
           <>
             {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-black/20 z-40"
+              className="fixed inset-0 z-40 bg-black/20"
               onClick={() => setShowSettings(false)}
             />
             {/* Settings Panel */}
-            <div className="fixed top-0 right-0 h-full w-80 border-l bg-background shadow-xl z-50 overflow-y-auto transition-transform duration-300 ease-out">
-              <div className="sticky top-0 bg-background border-b px-4 py-3 flex items-center justify-between z-10 shadow-sm">
+            <div className="bg-background fixed top-0 right-0 z-50 h-full w-80 overflow-y-auto border-l shadow-xl transition-transform duration-300 ease-out">
+              <div className="bg-background sticky top-0 z-10 flex items-center justify-between border-b px-4 py-3 shadow-sm">
                 <h2 className="text-lg font-semibold">الإعدادات</h2>
                 <Button variant="ghost" size="sm" onClick={() => setShowSettings(false)}>
                   ✕
@@ -258,4 +258,3 @@ export function ChatBot() {
     </div>
   );
 }
-
