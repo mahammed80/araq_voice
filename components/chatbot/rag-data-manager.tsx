@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/livekit/button';
-import type { RAGDataEntry, RAGDataEntryInput, RAGDataCategory } from '@/types/rag-data';
+import type { RAGDataCategory, RAGDataEntry, RAGDataEntryInput } from '@/types/rag-data';
 
 const CATEGORIES: { value: RAGDataCategory; label: string }[] = [
   { value: 'product', label: 'Products' },
@@ -18,7 +18,7 @@ export function RAGDataManager() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [editingEntry, setEditingEntry] = useState<RAGDataEntry | null>(null);
   const [showEntryForm, setShowEntryForm] = useState(false);
-  
+
   const [formData, setFormData] = useState<RAGDataEntryInput>({
     category: 'product',
     title: '',
@@ -30,9 +30,8 @@ export function RAGDataManager() {
   const fetchEntries = async (category?: string) => {
     setLoading(true);
     try {
-      const url = category && category !== 'all' 
-        ? `/api/rag/data?category=${category}`
-        : '/api/rag/data';
+      const url =
+        category && category !== 'all' ? `/api/rag/data?category=${category}` : '/api/rag/data';
       const res = await fetch(url);
       const data = await res.json();
       setEntries(data.entries || []);
@@ -140,7 +139,7 @@ export function RAGDataManager() {
       </div>
 
       {/* Category Filter */}
-      <div className="flex-wrap items-center gap-2 flex">
+      <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm font-medium">تصفية:</span>
         <button
           onClick={() => setSelectedCategory('all')}
@@ -245,8 +244,8 @@ export function RAGDataManager() {
                 className="bg-background text-foreground w-full rounded-md border px-3 py-2"
               />
               <p className="muted-foreground mt-1 text-xs">
-                هذا المحتوى سيكون قابلاً للبحث بواسطة المساعد. أضف جميع التفاصيل المهمة مثل
-                الأسعار والميزات والأوصاف
+                هذا المحتوى سيكون قابلاً للبحث بواسطة المساعد. أضف جميع التفاصيل المهمة مثل الأسعار
+                والميزات والأوصاف
               </p>
             </div>
 
