@@ -201,7 +201,7 @@ export function RAGDataManager() {
 
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium mb-1">الفئة</label>
+              <label className="mb-1 block text-sm font-medium">الفئة</label>
               <select
                 value={formData.category}
                 onChange={(e) =>
@@ -218,7 +218,7 @@ export function RAGDataManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="mb-1 block text-sm font-medium">
                 العنوان <span className="text-red-500">*</span>
               </label>
               <input
@@ -226,12 +226,12 @@ export function RAGDataManager() {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="مثال: باقة البريميوم"
-                className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
+                className="bg-background text-foreground w-full rounded-md border px-3 py-2"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="mb-1 block text-sm font-medium">
                 المحتوى <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -239,7 +239,7 @@ export function RAGDataManager() {
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="أدخل التفاصيل الكاملة عن المنتج، الخدمة، السعر، أو معلومات الشركة..."
                 rows={6}
-                className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
+                className="bg-background text-foreground w-full rounded-md border px-3 py-2"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 هذا المحتوى سيكون قابلاً للبحث بواسطة المساعد. أضف جميع التفاصيل المهمة مثل الأسعار والميزات والأوصاف
@@ -247,7 +247,7 @@ export function RAGDataManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="mb-1 block text-sm font-medium">
                 بيانات إضافية (JSON، اختياري)
               </label>
               <textarea
@@ -255,7 +255,7 @@ export function RAGDataManager() {
                 onChange={(e) => setMetadataJson(e.target.value)}
                 placeholder='{"price": 99.99, "currency": "SAR", "availability": "متوفر"}'
                 rows={3}
-                className="w-full px-3 py-2 border rounded-md bg-background text-foreground font-mono text-sm"
+                className="bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm"
               />
             </div>
           </div>
@@ -264,10 +264,14 @@ export function RAGDataManager() {
             <Button variant="primary" size="sm" onClick={handleSaveEntry} className="flex-1">
               {editingEntry ? 'تحديث' : 'حفظ'}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => {
-              setShowEntryForm(false);
-              setEditingEntry(null);
-            }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setShowEntryForm(false);
+                setEditingEntry(null);
+              }}
+            >
               إلغاء
             </Button>
           </div>
@@ -275,32 +279,30 @@ export function RAGDataManager() {
       )}
 
       {/* Entries List */}
-      <div className="space-y-2 max-h-96 overflow-y-auto">
+      <div className="max-h-96 space-y-2 overflow-y-auto">
         {loading ? (
-          <p className="text-sm text-muted-foreground text-center py-4">جاري التحميل...</p>
+          <p className="muted-foreground py-4 text-center text-sm">جاري التحميل...</p>
         ) : filteredEntries.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">
+          <p className="muted-foreground py-4 text-center text-sm">
             لا توجد بيانات. أضف أول بياناتك للبدء!
           </p>
         ) : (
           filteredEntries.map((entry) => (
             <div
               key={entry.id}
-              className="p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors"
+              className="bg-background hover:bg-muted/50 rounded-lg border p-3 transition-colors"
             >
               <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-medium">
                       {CATEGORIES.find((c) => c.value === entry.category)?.label || entry.category}
                     </span>
-                    <h5 className="font-semibold truncate">{entry.title}</h5>
+                    <h5 className="truncate font-semibold">{entry.title}</h5>
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {entry.content}
-                  </p>
+                  <p className="muted-foreground line-clamp-2 text-sm">{entry.content}</p>
                 </div>
-                <div className="flex gap-1 shrink-0">
+                <div className="shrink-0 flex gap-1">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -326,4 +328,3 @@ export function RAGDataManager() {
     </div>
   );
 }
-
