@@ -31,7 +31,7 @@ export const ChatEntry = ({
 }: ChatEntryProps) => {
   const time = new Date(timestamp);
   const title = time.toLocaleTimeString(locale, { timeStyle: 'full' });
-  
+
   // Determine display name based on agent status or provided name
   const displayName = name || (isAgent ? 'Agent' : messageOrigin === 'local' ? 'You' : 'User');
 
@@ -58,10 +58,10 @@ export const ChatEntry = ({
       <span
         className={cn(
           'max-w-4/5 rounded-[20px] p-2',
-          messageOrigin === 'local' 
-            ? 'bg-muted ml-auto' 
-            : isAgent 
-              ? 'bg-primary/10 mr-auto border border-primary/20' 
+          messageOrigin === 'local'
+            ? 'bg-muted ml-auto'
+            : isAgent
+              ? 'border-primary/20 mr-auto border bg-primary/10'
               : 'bg-muted mr-auto'
         )}
       >

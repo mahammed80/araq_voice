@@ -1,10 +1,10 @@
-import type { RAGDataEntry, RAGDataEntryInput, RAGDataCategory } from '@/types/rag-data';
+import type { RAGDataCategory, RAGDataEntry, RAGDataEntryInput } from '@/types/rag-data';
 
 // In-memory storage for RAG data
 // In production, this should be replaced with a proper database (PostgreSQL, MongoDB, etc.)
 // and vector database (Qdrant, Pinecone, Weaviate, etc.)
 
-let ragDataStore: Map<string, RAGDataEntry> = new Map();
+const ragDataStore: Map<string, RAGDataEntry> = new Map();
 
 // Initialize with some example data
 if (ragDataStore.size === 0) {
@@ -13,7 +13,8 @@ if (ragDataStore.size === 0) {
       id: '1',
       category: 'company',
       title: 'Company Information',
-      content: 'AraQ is a leading AI technology company specializing in voice assistants and conversational AI solutions.',
+      content:
+        'AraQ is a leading AI technology company specializing in voice assistants and conversational AI solutions.',
       metadata: {},
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -82,9 +83,7 @@ export class RAGStorage {
 
   // Get all data as a formatted string for agent context
   static getFormattedDataForAgent(category?: RAGDataCategory): string {
-    const entries = category
-      ? this.getEntriesByCategory(category)
-      : this.getAllEntries();
+    const entries = category ? this.getEntriesByCategory(category) : this.getAllEntries();
 
     if (entries.length === 0) {
       return '';
@@ -104,4 +103,3 @@ export class RAGStorage {
     return formatted.join('\n\n');
   }
 }
-
