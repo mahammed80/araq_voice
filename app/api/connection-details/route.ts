@@ -35,10 +35,7 @@ export async function POST(req: Request) {
       body = await req.json();
     } catch (parseError) {
       console.error('Error parsing request body:', parseError);
-      return NextResponse.json(
-        { error: 'Invalid request body' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
     }
 
     const agentName: string = body?.room_config?.agents?.[0]?.agent_name;
@@ -68,10 +65,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Error in connection-details route:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
