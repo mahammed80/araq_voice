@@ -2,8 +2,16 @@ import { NextRequest } from 'next/server';
 import { Groq } from 'groq-sdk';
 import { RAGStorage } from '@/lib/rag-storage';
 
+// Get API key from environment variables only (no hardcoded fallback)
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+if (!GROQ_API_KEY) {
+  console.error('GROQ_API_KEY is not defined in environment variables');
+  throw new Error('GROQ_API_KEY environment variable is required');
+}
+
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || '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',
+  apiKey: GROQ_API_KEY,
 });
 
 // Note: Using Node.js runtime as Groq SDK requires Node.js APIs
