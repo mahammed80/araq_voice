@@ -58,7 +58,7 @@ export function RAGDataManager() {
       if (metadataJson.trim()) {
         try {
           metadata = JSON.parse(metadataJson);
-        } catch (e) {
+        } catch {
           alert('صيغة JSON غير صحيحة في حقل البيانات الإضافية');
           return;
         }
@@ -127,25 +127,24 @@ export function RAGDataManager() {
     }
   };
 
-  const filteredEntries = selectedCategory === 'all' 
-    ? entries 
-    : entries.filter((e) => e.category === selectedCategory);
+  const filteredEntries =
+    selectedCategory === 'all' ? entries : entries.filter((e) => e.category === selectedCategory);
 
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold mb-2">إدارة بيانات الشركة</h3>
-        <p className="text-sm text-muted-foreground mb-4">
+        <h3 className="mb-2 text-lg font-semibold">إدارة بيانات الشركة</h3>
+        <p className="muted-foreground mb-4 text-sm">
           أضف بيانات شركتك (منتجات، خدمات، أسعار، معلومات الشركة) التي سيجيب عليها المساعد
         </p>
       </div>
 
       {/* Category Filter */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex-wrap items-center gap-2 flex">
         <span className="text-sm font-medium">تصفية:</span>
         <button
           onClick={() => setSelectedCategory('all')}
-          className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+          className={`rounded-full border px-3 py-1 text-xs transition-colors ${
             selectedCategory === 'all'
               ? 'bg-primary text-primary-foreground border-primary'
               : 'bg-background hover:bg-muted'
@@ -157,7 +156,7 @@ export function RAGDataManager() {
           <button
             key={cat.value}
             onClick={() => setSelectedCategory(cat.value)}
-            className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+            className={`rounded-full border px-3 py-1 text-xs transition-colors ${
               selectedCategory === cat.value
                 ? 'bg-primary text-primary-foreground border-primary'
                 : 'bg-background hover:bg-muted'
@@ -186,15 +185,19 @@ export function RAGDataManager() {
 
       {/* Entry Form */}
       {showEntryForm && (
-        <div className="p-4 border rounded-lg bg-muted/30 space-y-4">
+        <div className="bg-muted/30 space-y-4 rounded-lg border p-4">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold">
               {editingEntry ? 'تعديل البيانات' : 'إضافة بيانات جديدة'}
             </h4>
-            <Button variant="ghost" size="sm" onClick={() => {
-              setShowEntryForm(false);
-              setEditingEntry(null);
-            }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setShowEntryForm(false);
+                setEditingEntry(null);
+              }}
+            >
               ✕
             </Button>
           </div>
@@ -207,7 +210,7 @@ export function RAGDataManager() {
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value as RAGDataCategory })
                 }
-                className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
+                className="bg-background text-foreground w-full rounded-md border px-3 py-2"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -241,8 +244,9 @@ export function RAGDataManager() {
                 rows={6}
                 className="bg-background text-foreground w-full rounded-md border px-3 py-2"
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                هذا المحتوى سيكون قابلاً للبحث بواسطة المساعد. أضف جميع التفاصيل المهمة مثل الأسعار والميزات والأوصاف
+              <p className="muted-foreground mt-1 text-xs">
+                هذا المحتوى سيكون قابلاً للبحث بواسطة المساعد. أضف جميع التفاصيل المهمة مثل
+                الأسعار والميزات والأوصاف
               </p>
             </div>
 
@@ -302,7 +306,7 @@ export function RAGDataManager() {
                   </div>
                   <p className="muted-foreground line-clamp-2 text-sm">{entry.content}</p>
                 </div>
-                <div className="shrink-0 flex gap-1">
+                <div className="flex shrink-0 gap-1">
                   <Button
                     variant="ghost"
                     size="sm"
