@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { Button } from '@/components/livekit/button';
+import { RAGConfig } from '@/components/app/rag-config';
+import { useSession } from '@/components/app/session-provider';
 
 function WelcomeImage() {
   return (
@@ -28,18 +31,41 @@ export const WelcomeView = ({
   onStartCall,
   ref,
 }: React.ComponentProps<'div'> & WelcomeViewProps) => {
+  const { appConfig, updateRAGConfig } = useSession();
+  const [showRAGConfig, setShowRAGConfig] = useState(false);
+
   return (
     <div ref={ref}>
-      <section className="bg-background flex flex-col items-center justify-center text-center">
+      <section className="bg-background flex flex-col items-center justify-center text-center px-4">
         <WelcomeImage />
 
         <p className="text-foreground max-w-prose pt-1 leading-6 font-medium">
           Chat live with your voice AI agent
         </p>
 
-        <Button variant="primary" size="lg" onClick={onStartCall} className="mt-6 w-64 font-mono">
-          {startButtonText}
-        </Button>
+        <div className="mt-6 space-y-3 w-full max-w-md">
+          <Button variant="primary" size="lg" onClick={onStartCall} className="w-full font-mono">
+            {startButtonText}
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowRAGConfig(!showRAGConfig)}
+            className="w-full"
+          >
+            {showRAGConfig ? 'Hide' : 'Configure'} RAG Settings
+          </Button>
+
+          {showRAGConfig && (
+            <div className="mt-4 w-full max-w-2xl">
+              <RAGConfig 
+                ragConfig={appConfig.ragConfig} 
+                onConfigChange={updateRAGConfig}
+              />
+            </div>
+          )}
+        </div>
       </section>
     </div>
   );

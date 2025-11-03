@@ -67,6 +67,8 @@ export function ChatTranscript({
             const locale = navigator?.language ?? 'en-US';
             const messageOrigin = from?.isLocal ? 'local' : 'remote';
             const hasBeenEdited = !!editTimestamp;
+            const isAgent = from?.isAgent ?? false;
+            const participantName = from?.name;
 
             return (
               <MotionChatEntry
@@ -76,6 +78,8 @@ export function ChatTranscript({
                 message={message}
                 messageOrigin={messageOrigin}
                 hasBeenEdited={hasBeenEdited}
+                isAgent={isAgent}
+                name={participantName}
                 {...MESSAGE_MOTION_PROPS}
               />
             );

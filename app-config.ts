@@ -17,6 +17,13 @@ export interface AppConfig {
   // for LiveKit Cloud Sandbox
   sandboxId?: string;
   agentName?: string;
+  // RAG configuration
+  ragConfig?: {
+    collectionName?: string;
+    topK?: number;
+    metadata?: Record<string, any>;
+    // Data entries are stored separately and referenced by collectionName
+  };
 }
 
 export const APP_CONFIG_DEFAULTS: AppConfig = {
@@ -38,4 +45,6 @@ export const APP_CONFIG_DEFAULTS: AppConfig = {
   // for LiveKit Cloud Sandbox
   sandboxId: undefined,
   agentName: undefined,
+  // RAG configuration
+  ragConfig: undefined,
 };

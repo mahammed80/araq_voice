@@ -55,6 +55,7 @@ export function useRoom(appConfig: AppConfig) {
               room_config: appConfig.agentName
                 ? {
                     agents: [{ agent_name: appConfig.agentName }],
+                    ...(appConfig.ragConfig && { rag_config: appConfig.ragConfig }),
                   }
                 : undefined,
             }),

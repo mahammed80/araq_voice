@@ -39,6 +39,7 @@ export async function POST(req: Request) {
     }
 
     const agentName: string = body?.room_config?.agents?.[0]?.agent_name;
+    const ragConfig = body?.room_config?.rag_config;
 
     // Generate participant token
     const participantName = 'user';
@@ -48,7 +49,8 @@ export async function POST(req: Request) {
     const participantToken = await createParticipantToken(
       { identity: participantIdentity, name: participantName },
       roomName,
-      agentName
+      agentName,
+      ragConfig
     );
 
     // Return connection details
@@ -72,7 +74,12 @@ export async function POST(req: Request) {
 function createParticipantToken(
   userInfo: AccessTokenOptions,
   roomName: string,
-  agentName?: string
+  agentName?: string,
+  ragConfig?: {
+    collectionName?: string;
+    topK?: number;
+    metadata?: Record<string, any>;
+  }
 ): Promise<string> {
   const at = new AccessToken(API_KEY, API_SECRET, {
     ...userInfo,
@@ -88,6 +95,26 @@ function createParticipantToken(
   at.addGrant(grant);
 
   if (agentName) {
+    // Add RAG configuration if provided
+    // Pass it as metadata in the token so the agent can access it
+    if (ragConfig) {
+      // Store RAG config in token metadata for agent access
+      const metadata: Record<string, any> = {};
+      if (ragConfig.collectionName) {
+        metadata.rag_collection = ragConfig.collectionName;
+      }
+      if (ragConfig.topK) {
+        metadata.rag_top_k = ragConfig.topK;
+      }
+      if (ragConfig.metadata) {
+        metadata.rag_metadata = ragConfig.metadata;
+      }
+      
+      if (Object.keys(metadata).length > 0) {
+        at.metadata = JSON.stringify(metadata);
+      }
+    }
+    
     at.roomConfig = new RoomConfiguration({
       agents: [{ agentName }],
     });

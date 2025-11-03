@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import Link from 'next/link';
 import { getAppConfig } from '@/lib/utils';
 
 interface LayoutProps {
@@ -11,13 +12,21 @@ export default async function Layout({ children }: LayoutProps) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 z-50 hidden w-full flex-row justify-between p-6 md:flex">
-        <div className="scale-100 transition-transform duration-300">
+      <header className="fixed top-0 left-0 z-50 hidden w-full flex-row items-center justify-between p-6 md:flex">
+        <Link href="/" className="scale-100 transition-transform duration-300 hover:scale-105">
           <span className="text-foreground font-mono text-lg font-bold tracking-wider">AraQ</span>
+        </Link>
+        <div className="flex items-center gap-6">
+          <Link
+            href="/chat"
+            className="text-foreground font-mono text-sm font-medium tracking-wider hover:text-primary transition-colors"
+          >
+            Chat
+          </Link>
+          <span className="text-foreground font-mono text-xs font-bold tracking-wider uppercase">
+            Built with AraQ
+          </span>
         </div>
-        <span className="text-foreground font-mono text-xs font-bold tracking-wider uppercase">
-          Built with AraQ
-        </span>
       </header>
 
       {children}
