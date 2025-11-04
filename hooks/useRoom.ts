@@ -64,12 +64,13 @@ export function useRoom(appConfig: AppConfig) {
           if (!res.ok) {
             const errorData = await res.json().catch(() => ({ error: res.statusText }));
             throw new Error(
-              errorData.error || `Failed to fetch connection details: ${res.status} ${res.statusText}`
+              errorData.error ||
+                `Failed to fetch connection details: ${res.status} ${res.statusText}`
             );
           }
 
           const data = await res.json();
-          
+
           if (!data.serverUrl || !data.participantToken) {
             throw new Error('Invalid connection details received from server');
           }
@@ -80,7 +81,9 @@ export function useRoom(appConfig: AppConfig) {
           if (error instanceof Error) {
             throw error;
           }
-          throw new Error('Failed to fetch connection details. Please check your environment configuration.');
+          throw new Error(
+            'Failed to fetch connection details. Please check your environment configuration.'
+          );
         }
       }),
     [appConfig]

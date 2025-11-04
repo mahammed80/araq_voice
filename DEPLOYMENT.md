@@ -122,6 +122,7 @@ If port 3000 is already in use, change the PORT in `ecosystem.config.js` and upd
 ### Build errors
 
 Ensure all dependencies are installed:
+
 ```bash
 pnpm install
 # or
@@ -131,8 +132,8 @@ npm install
 ## Current Setup
 
 You should have both services running:
+
 - `araq-voice` - Python backend agent
 - `araq-frontend` - Next.js frontend application
 
 Check with: `pm2 list`
-
