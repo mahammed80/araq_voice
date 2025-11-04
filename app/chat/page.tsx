@@ -1,10 +1,7 @@
-import { headers } from 'next/headers';
 import { ChatBot } from '@/components/chatbot/chatbot';
-import { getAppConfig } from '@/lib/utils';
 
-export default async function ChatPage() {
-  const hdrs = await headers();
-  await getAppConfig(hdrs);
+export const dynamic = 'force-dynamic';
 
+export default function ChatPage() {
   return <ChatBot />;
 }
