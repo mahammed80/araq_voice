@@ -25,15 +25,18 @@ This creates an optimized production build in the `.next` directory.
 
 ### 2. Set Up Environment Variables
 
-Create a `.env.production` file (or set environment variables in your PM2 config) with your LiveKit credentials:
+Create a `.env.production` file (or set environment variables in your PM2 config) with your credentials:
 
 ```env
 LIVEKIT_URL=your-livekit-url
 LIVEKIT_API_KEY=your-api-key
 LIVEKIT_API_SECRET=your-api-secret
+GROQ_API_KEY=your-groq-api-key
 PORT=3000
 NODE_ENV=production
 ```
+
+**Note:** The `GROQ_API_KEY` is required for the chat functionality to work. You can get your API key from [Groq Console](https://console.groq.com/).
 
 ### 3. Create Logs Directory
 
@@ -45,16 +48,43 @@ mkdir -p logs
 
 ### 4. Start with PM2
 
-Use the ecosystem config file to start the application:
+**Important:** Before starting PM2, export your environment variables or they won't be available to the application:
 
 ```bash
+# Option 1: Export variables in your shell session
+export GROQ_API_KEY="your-groq-api-key"
+export LIVEKIT_API_KEY="your-livekit-api-key"
+export LIVEKIT_API_SECRET="your-livekit-api-secret"
+export LIVEKIT_URL="your-livekit-url"
+
+# Then start PM2
 pm2 start ecosystem.config.js
 ```
 
-Or start it manually:
+**Option 2:** Create a startup script that loads variables from `.env.production`:
 
 ```bash
-pm2 start npm --name "araq-frontend" -- start
+# Create start script
+cat > start.sh << 'EOF'
+#!/bin/bash
+set -a
+source .env.production
+set +a
+pm2 start ecosystem.config.js
+EOF
+
+chmod +x start.sh
+./start.sh
+```
+
+**Option 3:** Use PM2's ecosystem config with inline variables (less secure):
+
+Edit `ecosystem.config.js` and replace the empty strings with your actual values, then restart PM2.
+
+After setting environment variables, restart PM2:
+
+```bash
+pm2 restart araq-frontend --update-env
 ```
 
 ### 5. Configure Reverse Proxy (Nginx)

@@ -34,7 +34,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ entries });
   } catch (error) {
     console.error('Error fetching RAG data:', error);
-    return NextResponse.json({ error: 'Failed to fetch RAG data' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error('Error details:', { message: errorMessage, stack: errorStack });
+    return NextResponse.json(
+      { 
+        error: 'Failed to fetch RAG data',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -50,7 +59,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const entry = RAGStorage.createEntry(body);
+    const entry = await RAGStorage.createEntry(body);
     return NextResponse.json({ entry }, { status: 201 });
   } catch (error) {
     console.error('Error creating RAG data entry:', error);

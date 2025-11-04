@@ -24,43 +24,48 @@ export function ChatMessages({ messages, streamingContent, isLoading }: ChatMess
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
-      {messages.map((message) => (
-        <div
-          key={message.id}
-          className={cn('flex gap-3', message.role === 'user' ? 'flex-row-reverse' : 'flex-row')}
-        >
-          {/* Avatar */}
-          <div
-            className={cn(
-              'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-medium',
-              message.role === 'user'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground'
-            )}
-          >
-            {message.role === 'user' ? 'أنت' : 'مساعد'}
-          </div>
+    <div className="space-y-3 pb-4" dir="rtl" lang="ar">
+      {messages.map((message) => {
+        // User message layout (RIGHT side)
+        if (message.role === 'user') {
+          return (
+            <div key={message.id} className="flex items-start gap-2 flex-row-reverse justify-start">
+              {/* Avatar */}
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 bg-primary/20 border-primary">
+                <span className="text-xs">👤</span>
+              </div>
 
-          {/* Message Content */}
-          <div
-            className={cn(
-              'flex-1 rounded-lg px-4 py-2',
-              message.role === 'user'
-                ? 'bg-primary text-primary-foreground ml-auto max-w-[80%]'
-                : 'bg-muted text-foreground mr-auto max-w-[80%]'
-            )}
-          >
-            <div className="break-words whitespace-pre-wrap">
-              {message.content ||
-                (isLoading && message.role === 'assistant' ? streamingContent : '')}
+              {/* Message Bubble */}
+              <div className="rounded-2xl px-4 py-2.5 bg-primary text-primary-foreground max-w-[75%]">
+                <div className="break-words whitespace-pre-wrap leading-relaxed text-right">
+                  {message.content}
+                </div>
+              </div>
             </div>
-            {isLoading && message.role === 'assistant' && message.content && streamingContent && (
-              <span className="ml-1 inline-block animate-pulse">▋</span>
-            )}
+          );
+        }
+
+        // System/Assistant message layout (LEFT side)
+        return (
+          <div key={message.id} className="flex items-start gap-2 flex-row justify-start">
+            {/* Avatar */}
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 bg-primary/20 border-primary">
+              <span className="text-xs">🤖</span>
+            </div>
+
+            {/* Message Bubble */}
+            <div className="rounded-2xl px-4 py-2.5 bg-primary/40 text-foreground max-w-[75%]">
+              <div className="break-words whitespace-pre-wrap leading-relaxed text-right">
+                {message.content ||
+                  (isLoading ? streamingContent : '')}
+              </div>
+              {isLoading && message.content && streamingContent && (
+                <span className="mr-2 inline-block animate-pulse text-lg">▋</span>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

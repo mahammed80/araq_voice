@@ -25,7 +25,7 @@ export function ChatSettings({ settings, onSettingsChange }: ChatSettingsProps) 
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" dir="rtl" lang="ar">
       {/* Tabs */}
       <div className="flex gap-2 border-b">
         <button

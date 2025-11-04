@@ -27,18 +27,20 @@ export function ChatInput({ onSend, isLoading, onStop }: ChatInputProps) {
   };
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <div className="flex gap-2">
+    <div className="flex gap-3" dir="rtl" lang="ar">
+      <div className="bg-background border-border flex flex-1 items-end gap-3 rounded-xl border px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-primary/20">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="اكتب رسالتك... (Enter للإرسال، Shift+Enter لسطر جديد)"
           disabled={isLoading}
-          className="bg-background text-foreground placeholder:text-muted-foreground focus:ring-primary flex-1 resize-none rounded-lg border px-4 py-3 focus:ring-2 focus:outline-none disabled:opacity-50"
+          dir="rtl"
+          lang="ar"
+          className="text-foreground placeholder:text-muted-foreground flex-1 resize-none bg-transparent text-right focus:outline-none disabled:opacity-50"
           rows={1}
           style={{
-            minHeight: '44px',
+            minHeight: '24px',
             maxHeight: '200px',
           }}
           onInput={(e) => {
@@ -47,16 +49,26 @@ export function ChatInput({ onSend, isLoading, onStop }: ChatInputProps) {
             target.style.height = `${Math.min(target.scrollHeight, 200)}px`;
           }}
         />
-        {isLoading ? (
-          <Button variant="primary" onClick={onStop}>
-            إيقاف
-          </Button>
-        ) : (
-          <Button variant="primary" onClick={handleSend} disabled={!input.trim()}>
-            إرسال
-          </Button>
-        )}
       </div>
+      {!isLoading && (
+        <Button
+          variant="primary"
+          onClick={handleSend}
+          disabled={!input.trim()}
+          className="h-12 w-12 rounded-xl px-0 shadow-sm"
+        >
+          <span className="text-lg">←</span>
+        </Button>
+      )}
+      {isLoading && (
+        <Button
+          variant="destructive"
+          onClick={onStop}
+          className="h-12 w-12 rounded-xl px-0 shadow-sm"
+        >
+          <span className="text-lg">⏹</span>
+        </Button>
+      )}
     </div>
   );
 }

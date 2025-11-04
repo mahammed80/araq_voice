@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { ChatInput } from '@/components/chatbot/chat-input';
 import { ChatMessages } from '@/components/chatbot/chat-messages';
 import { ChatSettings } from '@/components/chatbot/chat-settings';
+import { ChatSidebar } from '@/components/chatbot/chat-sidebar';
 import { Button } from '@/components/livekit/button';
 
 export interface ChatMessage {
@@ -35,18 +35,23 @@ const DEFAULT_SETTINGS: ChatSettings = {
 export function ChatBot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS);
   const [streamingContent, setStreamingContent] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    // Scroll to bottom when messages or streaming content changes
+    const timer = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    return () => clearTimeout(timer);
   }, [messages, streamingContent]);
 
   const sendMessage = async (content: string) => {
@@ -99,11 +104,33 @@ export function ChatBot() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Try to get error details from response
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+            if (errorData.details) {
+              console.error('API Error Details:', errorData.details);
+            }
+          } catch (parseError) {
+            console.error('Error parsing JSON error response:', parseError);
+            errorMessage = `HTTP error! status: ${response.status} ${response.statusText}`;
+          }
+        } else {
+          // Response is not JSON (likely HTML error page)
+          const text = await response.text();
+          console.error('Non-JSON error response:', text.substring(0, 200));
+          errorMessage = `HTTP error! status: ${response.status} ${response.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
+      const decoder = new TextDecoder('utf-8');
       let fullContent = '';
 
       if (!reader) {
@@ -185,73 +212,70 @@ export function ChatBot() {
   };
 
   return (
-    <div className="bg-background flex h-screen flex-col">
-      {/* Header */}
-      <header className="bg-background border-b px-4 py-3">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="hover:text-primary text-foreground font-mono text-sm font-medium tracking-wider transition-colors"
-            >
-              ← Home
-            </Link>
-            <h1 className="text-xl font-semibold">محادثة مع مساعد AI</h1>
+    <div className="bg-background flex h-screen w-full" dir="rtl" lang="ar">
+      {/* Right Sidebar - Settings (on right in RTL) */}
+      <ChatSidebar settings={settings} onSettingsChange={setSettings} />
+
+      {/* Main Content Area */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Top Header */}
+        <header className="bg-background/80 backdrop-blur-sm border-b px-6 py-4" dir="rtl" lang="ar">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-foreground text-2xl font-bold">محادثة</h1>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)}>
-              {showSettings ? 'إخفاء' : 'إظهار'} الإعدادات
-            </Button>
+
+          {/* Model Selection */}
+          <div className="mt-4 flex items-center gap-2">
+            <button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors">
+              <span>🤖</span>
+              <span>{settings.model === 'llama-3.1-8b-instant' ? 'Llama 3.1' : settings.model}</span>
+            </button>
             {messages.length > 0 && (
-              <Button variant="ghost" size="sm" onClick={clearChat}>
-                مسح المحادثة
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearChat}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                🗑️ مسح المحادثة
               </Button>
             )}
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Main Chat Area */}
-        <div className="flex flex-1 flex-col">
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4">
-            <ChatMessages
-              messages={messages}
-              streamingContent={streamingContent}
-              isLoading={isLoading}
-            />
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input */}
-          <div className="bg-background border-t px-4 py-4">
-            <ChatInput onSend={sendMessage} isLoading={isLoading} onStop={stopGeneration} />
-          </div>
-        </div>
-
-        {/* Settings Panel Overlay */}
-        {showSettings && (
-          <>
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 z-40 bg-black/20"
-              onClick={() => setShowSettings(false)}
-            />
-            {/* Settings Panel */}
-            <div className="bg-background fixed top-0 right-0 z-50 h-full w-80 overflow-y-auto border-l shadow-xl transition-transform duration-300 ease-out">
-              <div className="bg-background sticky top-0 z-10 flex items-center justify-between border-b px-4 py-3 shadow-sm">
-                <h2 className="text-lg font-semibold">الإعدادات</h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowSettings(false)}>
-                  ✕
-                </Button>
-              </div>
-              <div className="p-4">
-                <ChatSettings settings={settings} onSettingsChange={setSettings} />
-              </div>
+        {/* Chat Messages Area */}
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-6 py-6 scroll-smooth">
+            <div className="mx-auto max-w-4xl">
+              <ChatMessages
+                messages={messages}
+                streamingContent={streamingContent}
+                isLoading={isLoading}
+              />
+              <div ref={messagesEndRef} />
             </div>
-          </>
-        )}
+          </div>
+
+          {/* Input Area */}
+          <div className="bg-background/80 backdrop-blur-sm border-t px-6 py-4">
+            <div className="mx-auto max-w-4xl">
+              {isLoading && (
+                <div className="mb-3 flex items-center justify-center gap-2">
+                  <button
+                    onClick={stopGeneration}
+                    className="text-muted-foreground hover:text-foreground flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors"
+                  >
+                    <span>🔄</span>
+                    <span>إيقاف الإجابة</span>
+                  </button>
+                </div>
+              )}
+              <ChatInput onSend={sendMessage} isLoading={isLoading} onStop={stopGeneration} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

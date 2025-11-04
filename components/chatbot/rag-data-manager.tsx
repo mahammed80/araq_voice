@@ -33,10 +33,23 @@ export function RAGDataManager() {
       const url =
         category && category !== 'all' ? `/api/rag/data?category=${category}` : '/api/rag/data';
       const res = await fetch(url);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error('Expected JSON but got:', text.substring(0, 200));
+        throw new Error('Invalid response format');
+      }
+      
       const data = await res.json();
       setEntries(data.entries || []);
     } catch (error) {
       console.error('Error fetching entries:', error);
+      alert('فشل تحميل البيانات. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
     }
@@ -69,19 +82,75 @@ export function RAGDataManager() {
       };
 
       if (editingEntry) {
+        // Verify entry exists before updating
+        if (!editingEntry.id) {
+          throw new Error('Entry ID is missing. Please refresh and try again.');
+        }
+
+        console.log('Updating entry:', editingEntry.id, payload);
         const res = await fetch(`/api/rag/data/${editingEntry.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        if (!res.ok) throw new Error('Failed to update entry');
+        
+        if (!res.ok) {
+          const contentType = res.headers.get('content-type');
+          let errorData = { error: 'Unknown error' };
+          
+          if (contentType && contentType.includes('application/json')) {
+            try {
+              errorData = await res.json();
+            } catch {
+              const text = await res.text();
+              console.error('Error response (non-JSON):', text.substring(0, 200));
+              errorData = { error: `HTTP ${res.status}: ${res.statusText}` };
+            }
+          } else {
+            const text = await res.text();
+            console.error('Error response (HTML):', text.substring(0, 200));
+            errorData = { error: `HTTP ${res.status}: ${res.statusText}` };
+          }
+          
+          console.error('Update error response:', errorData, 'Status:', res.status);
+          throw new Error(errorData.error || `Failed to update entry: ${res.status} ${res.statusText}`);
+        }
+        
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await res.text();
+          console.error('Expected JSON but got:', text.substring(0, 200));
+          throw new Error('Invalid response format');
+        }
+        
+        const responseData = await res.json();
+        console.log('Update successful:', responseData);
       } else {
         const res = await fetch('/api/rag/data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        if (!res.ok) throw new Error('Failed to create entry');
+        if (!res.ok) {
+          const contentType = res.headers.get('content-type');
+          let errorData = { error: 'Unknown error' };
+          
+          if (contentType && contentType.includes('application/json')) {
+            try {
+              errorData = await res.json();
+            } catch {
+              const text = await res.text();
+              console.error('Error response (non-JSON):', text.substring(0, 200));
+              errorData = { error: `HTTP ${res.status}: ${res.statusText}` };
+            }
+          } else {
+            const text = await res.text();
+            console.error('Error response (HTML):', text.substring(0, 200));
+            errorData = { error: `HTTP ${res.status}: ${res.statusText}` };
+          }
+          
+          throw new Error(errorData.error || `Failed to create entry: ${res.status} ${res.statusText}`);
+        }
       }
 
       setFormData({ category: 'product', title: '', content: '', metadata: {} });
@@ -91,24 +160,47 @@ export function RAGDataManager() {
       fetchEntries(selectedCategory === 'all' ? undefined : selectedCategory);
     } catch (error) {
       console.error('Error saving entry:', error);
-      alert('فشل حفظ البيانات');
+      const errorMessage = error instanceof Error ? error.message : 'فشل حفظ البيانات';
+      alert(errorMessage);
     }
   };
 
-  const handleEditEntry = (entry: RAGDataEntry) => {
-    setEditingEntry(entry);
-    setFormData({
-      category: entry.category,
-      title: entry.title,
-      content: entry.content,
-      metadata: entry.metadata || {},
-    });
-    setMetadataJson(
-      entry.metadata && Object.keys(entry.metadata).length > 0
-        ? JSON.stringify(entry.metadata, null, 2)
-        : ''
-    );
-    setShowEntryForm(true);
+  const handleEditEntry = async (entry: RAGDataEntry) => {
+    // Verify entry still exists on server before editing
+    try {
+      const res = await fetch(`/api/rag/data/${entry.id}`);
+      if (!res.ok) {
+        alert('هذه البيانات لم تعد موجودة. يرجى تحديث القائمة.');
+        fetchEntries(selectedCategory === 'all' ? undefined : selectedCategory);
+        return;
+      }
+      
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error('Expected JSON but got:', text.substring(0, 200));
+        throw new Error('Invalid response format');
+      }
+      
+      const { entry: serverEntry } = await res.json();
+      
+      setEditingEntry(serverEntry);
+      setFormData({
+        category: serverEntry.category,
+        title: serverEntry.title,
+        content: serverEntry.content,
+        metadata: serverEntry.metadata || {},
+      });
+      setMetadataJson(
+        serverEntry.metadata && Object.keys(serverEntry.metadata).length > 0
+          ? JSON.stringify(serverEntry.metadata, null, 2)
+          : ''
+      );
+      setShowEntryForm(true);
+    } catch (error) {
+      console.error('Error verifying entry:', error);
+      alert('حدث خطأ أثناء تحميل البيانات. يرجى المحاولة مرة أخرى.');
+    }
   };
 
   const handleDeleteEntry = async (id: string) => {

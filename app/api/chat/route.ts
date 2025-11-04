@@ -6,7 +6,20 @@ import { RAGStorage } from '@/lib/rag-storage';
 export const runtime = 'nodejs';
 
 // Default Arabic system prompt for Saudi customer support
-const DEFAULT_ARABIC_SYSTEM_PROMPT = `Ø£Ù†Øª Ù…Ø³Ø§Ø¹Ø¯ Ø°ÙƒÙŠ Ù…ØªØ®ØµØµ ÙÙŠ Ø®Ø¯Ù…Ø© Ø¹Ù…Ù„Ø§Ø¡ Ø³Ø¹ÙˆØ¯ÙŠØ©. ÙŠØ¬Ø¨ Ø£Ù† ØªØ¬ÙŠØ¨ Ø¯Ø§Ø¦Ù…Ø§Ù‹ Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø¨Ø·Ø±ÙŠÙ‚Ø© Ù…Ù‡Ø°Ø¨Ø© ÙˆØ§Ø­ØªØ±Ø§ÙÙŠØ©. Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ù„ØºØ© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„ÙØµØ­Ù‰ Ø£Ùˆ Ø§Ù„Ù„Ù‡Ø¬Ø© Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ© Ø­Ø³Ø¨ Ø§Ù„Ø³ÙŠØ§Ù‚. ÙƒÙ† Ù…ÙÙŠØ¯Ø§Ù‹ ÙˆØ¯Ù‚ÙŠÙ‚Ø§Ù‹ ÙˆÙ…ØªØ¹Ø§ÙˆÙ†Ø§Ù‹. Ø£Ø¬Ø¨ Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰ Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…ØªÙˆÙØ±Ø© Ù…Ù† Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ù…Ø¹Ø±ÙØ© ÙÙ‚Ø·. Ø¥Ø°Ø§ Ù„Ù… ØªØ¬Ø¯ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø¯Ù‚ÙŠÙ‚Ø©ØŒ Ø£Ø®Ø¨Ø± Ø§Ù„Ø¹Ù…ÙŠÙ„ Ø¨Ø°Ù„Ùƒ Ø¨Ø£Ø¯Ø¨.`;
+const DEFAULT_ARABIC_SYSTEM_PROMPT = `أنت مساعد ذكي متخصص في خدمة عملاء سعودية تعمل لصالح شركة عرق (AraQ).
+
+عن الشركة:
+الشركة التي أنت متصل بها هي عرق (AraQ)، وهي شركة تقنية رائدة في مجال تقنيات الذكاء الاصطناعي، وتتخصص في مجالات مساعدات الصوت والتحديثات الذكية للواجهات النصية في الهواتف وغيرها من التطبيقات. نحن نقدم حلول ذكاء اصطناعي متقدمة للعملاء في المملكة العربية السعودية.
+
+تعليمات مهمة:
+- يجب أن تجيب دائماً بالعربية بطريقة مهذبة واحترافية
+- استخدم اللغة العربية الفصحى أو اللهجة السعودية حسب السياق
+- كن مفيداً ودقيقاً ومتعاوناً
+- أجب بناءً على المعلومات المتوفرة من قاعدة المعرفة فقط
+- إذا لم تجد معلومات دقيقة، أخبر العميل بذلك بأدب
+- إذا كان العميل يبحث عن خدمة محددة، اشرح له ما يمكنك تقديمه وساعده بأفضل ما لديك
+- كن ودوداً ومهتماً بمساعدة العميل في حل مشكلته أو الإجابة على أسئلته
+- إذا سألك العميل عن أي خدمة محددة، كن سعيداً لمساعدته وقدم له المعلومات المطلوبة`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,7 +41,32 @@ export async function POST(req: NextRequest) {
       apiKey: GROQ_API_KEY,
     });
 
-    const body = await req.json();
+    // Parse request body with error handling
+    let body;
+    try {
+      body = await req.json();
+    } catch (parseError) {
+      console.error('Error parsing request body:', parseError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid request body. Expected JSON.' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Validate required fields
+    if (!body.messages || !Array.isArray(body.messages)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request: messages array is required' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
     const {
       messages,
       model = 'llama-3.1-8b-instant',
@@ -40,17 +78,86 @@ export async function POST(req: NextRequest) {
       stop = null,
     } = body;
 
-    // Get RAG data if requested
+    // Get RAG data using vector-based retrieval if requested
     let ragDataContext = '';
     if (use_rag_data) {
-      ragDataContext = RAGStorage.getFormattedDataForAgent();
+      try {
+        // Get the user's question from the last message
+        const userMessage = messages[messages.length - 1];
+        const userQuery = userMessage?.content || '';
+        
+        // Use vector-based retrieval to get relevant context
+        ragDataContext = await RAGStorage.getRelevantContext(userQuery, 4);
+        
+        const allEntries = RAGStorage.getAllEntries();
+        console.log(`🔍 Vector RAG system: ${allEntries.length} total entries in storage`);
+        
+        if (ragDataContext) {
+          const chunkCount = ragDataContext.split('\n\n---\n\n').length;
+          console.log(`✅ Relevant context retrieved: ${ragDataContext.length} characters, ${chunkCount} relevant chunks`);
+          console.log('📋 Context preview:', ragDataContext.substring(0, 300));
+        } else {
+          console.warn('⚠️ No relevant context found for query:', userQuery);
+          // Fallback to all entries if no relevant context found
+          ragDataContext = RAGStorage.getFormattedDataForAgent();
+          if (ragDataContext) {
+            console.log('📄 Using fallback: all entries');
+          } else {
+            console.log('Available entries:', allEntries.map(e => ({ id: e.id, title: e.title, category: e.category })));
+          }
+        }
+      } catch (ragError) {
+        console.error('❌ Error in vector RAG retrieval:', ragError);
+        // Fallback to simple retrieval
+        try {
+          ragDataContext = RAGStorage.getFormattedDataForAgent();
+          console.log('📄 Fallback to simple RAG retrieval');
+        } catch (fallbackError) {
+          console.error('❌ Fallback also failed:', fallbackError);
+          ragDataContext = '';
+        }
+      }
+    } else {
+      console.log('RAG data disabled by user setting');
     }
 
     // Build system prompt with RAG data
     let finalSystemPrompt = system_prompt || DEFAULT_ARABIC_SYSTEM_PROMPT;
 
     if (ragDataContext && ragDataContext.trim()) {
-      finalSystemPrompt += `\n\nÙ…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø´Ø±ÙƒØ© Ù…Ù† Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ù…Ø¹Ø±ÙØ©:\n${ragDataContext}\n\nØ§Ø³ØªØ®Ø¯Ù… Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª ÙÙ‚Ø· Ù„Ù„Ø¥Ø¬Ø§Ø¨Ø© Ø¹Ù„Ù‰ Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡. Ø¥Ø°Ø§ Ù„Ù… ØªØ¬Ø¯ Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø© ÙÙŠ Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…ØªÙˆÙØ±Ø©ØŒ Ø£Ø®Ø¨Ø± Ø§Ù„Ø¹Ù…ÙŠÙ„ Ø¨Ø°Ù„Ùƒ.`;
+      finalSystemPrompt += `\n\n═══════════════════════════════════════════════════════════
+معلومات الشركة من قاعدة المعرفة (يجب استخدامها للإجابة)
+═══════════════════════════════════════════════════════════
+
+${ragDataContext}
+
+═══════════════════════════════════════════════════════════
+تعليمات إلزامية لاستخدام قاعدة المعرفة:
+═══════════════════════════════════════════════════════════
+
+1. **يجب إلزامياً** استخدام المعلومات المذكورة أعلاه من قاعدة المعرفة عند الإجابة على أي سؤال عن:
+   - المنتجات والخدمات
+   - الأسعار
+   - معلومات الشركة
+   - أي تفاصيل عن عرق (AraQ)
+
+2. **ممنوع منعاً باتاً**:
+   - اختراع معلومات غير موجودة في قاعدة المعرفة
+   - استخدام معلومات عامة بدلاً من المعلومات المحددة في قاعدة المعرفة
+   - الإجابة بناءً على معرفتك العامة فقط
+
+3. **إذا لم تجد المعلومات في قاعدة المعرفة**:
+   قل بوضوح: "أعتذر، لا تتوفر لدي هذه المعلومات المحددة حالياً في قاعدة المعرفة. يرجى التواصل معنا مباشرة للحصول على التفاصيل الدقيقة."
+
+4. **كن دقيقاً**: انقل المعلومات من قاعدة المعرفة بدقة كما هي، مع الحفاظ على الأرقام والأسعار والتفاصيل المذكورة.
+
+5. **أولوية المعلومات**: قاعدة المعرفة أعلاه لها الأولوية الكاملة على أي معلومات عامة قد تعرفها.
+
+═══════════════════════════════════════════════════════════`;
+      console.log('✅ RAG data included in system prompt:', ragDataContext.length, 'characters');
+      console.log('📋 RAG data preview:', ragDataContext.substring(0, 300));
+    } else {
+      console.warn('⚠️ No RAG data available or empty - responses will not use company knowledge base');
     }
 
     // Prepare messages with system prompt
@@ -95,9 +202,25 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Groq API error:', error);
+    
+    // Provide more detailed error information
+    let errorMessage = 'Failed to process chat request';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      // Log full error details for debugging
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      });
+    }
+    
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : 'Failed to process chat request',
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' 
+          ? (error instanceof Error ? error.stack : String(error))
+          : undefined,
       }),
       {
         status: 500,
