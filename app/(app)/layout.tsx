@@ -19,7 +19,7 @@ export default async function Layout({ children }: LayoutProps) {
         <div className="flex items-center gap-6">
           <Link
             href="/chat"
-            className="text-foreground font-mono text-sm font-medium tracking-wider hover:text-primary transition-colors"
+            className="text-foreground hover:text-primary font-mono text-sm font-medium tracking-wider transition-colors"
           >
             Chat
           </Link>

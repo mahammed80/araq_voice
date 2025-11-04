@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const collectionName = searchParams.get('collection');
 
     // Validate category if provided
-    const category: RAGDataCategory | undefined = 
+    const category: RAGDataCategory | undefined =
       categoryParam && VALID_CATEGORIES.includes(categoryParam as RAGDataCategory)
         ? (categoryParam as RAGDataCategory)
         : undefined;
@@ -26,10 +26,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching formatted RAG data:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch formatted RAG data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch formatted RAG data' }, { status: 500 });
   }
 }
-

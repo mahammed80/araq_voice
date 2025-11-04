@@ -34,10 +34,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ entries });
   } catch (error) {
     console.error('Error fetching RAG data:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch RAG data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch RAG data' }, { status: 500 });
   }
 }
 
@@ -57,10 +54,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ entry }, { status: 201 });
   } catch (error) {
     console.error('Error creating RAG data entry:', error);
-    return NextResponse.json(
-      { error: 'Failed to create RAG data entry' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create RAG data entry' }, { status: 500 });
   }
 }
-

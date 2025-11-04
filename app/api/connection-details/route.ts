@@ -78,7 +78,7 @@ function createParticipantToken(
   ragConfig?: {
     collectionName?: string;
     topK?: number;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }
 ): Promise<string> {
   const at = new AccessToken(API_KEY, API_SECRET, {
@@ -99,7 +99,7 @@ function createParticipantToken(
     // Pass it as metadata in the token so the agent can access it
     if (ragConfig) {
       // Store RAG config in token metadata for agent access
-      const metadata: Record<string, any> = {};
+      const metadata: Record<string, unknown> = {};
       if (ragConfig.collectionName) {
         metadata.rag_collection = ragConfig.collectionName;
       }
@@ -109,12 +109,12 @@ function createParticipantToken(
       if (ragConfig.metadata) {
         metadata.rag_metadata = ragConfig.metadata;
       }
-      
+
       if (Object.keys(metadata).length > 0) {
         at.metadata = JSON.stringify(metadata);
       }
     }
-    
+
     at.roomConfig = new RoomConfiguration({
       agents: [{ agentName }],
     });

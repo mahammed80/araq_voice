@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
-import { getAppConfig } from '@/lib/utils';
 import { ChatBot } from '@/components/chatbot/chatbot';
+import { getAppConfig } from '@/lib/utils';
 
 export default async function ChatPage() {
   const hdrs = await headers();
@@ -8,4 +8,3 @@ export default async function ChatPage() {
 
   return <ChatBot />;
 }
-

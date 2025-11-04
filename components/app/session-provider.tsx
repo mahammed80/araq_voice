@@ -37,12 +37,9 @@ export const SessionProvider = ({
 
   const { room, isSessionActive, startSession, endSession } = useRoom(appConfig);
 
-  const updateRAGConfig = useCallback(
-    (newRAGConfig: AppConfig['ragConfig']) => {
-      setRAGConfig(newRAGConfig);
-    },
-    []
-  );
+  const updateRAGConfig = useCallback((newRAGConfig: AppConfig['ragConfig']) => {
+    setRAGConfig(newRAGConfig);
+  }, []);
 
   const contextValue = useMemo(
     () => ({ appConfig, isSessionActive, startSession, endSession, updateRAGConfig }),
