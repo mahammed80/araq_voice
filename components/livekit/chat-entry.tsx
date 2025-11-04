@@ -1,7 +1,7 @@
-import * as React from 'react';
+import type { HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface ChatEntryProps extends React.HTMLAttributes<HTMLLIElement> {
+export interface ChatEntryProps extends HTMLAttributes<HTMLLIElement> {
   /** The locale to use for the timestamp. */
   locale: string;
   /** The timestamp of the message. */
