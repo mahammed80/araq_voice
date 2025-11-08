@@ -24,7 +24,7 @@ const DEFAULT_ARABIC_SYSTEM_PROMPT = `أنت مساعد ذكي متخصص في �
 export async function POST(req: NextRequest) {
   try {
     // Get API key from environment variables only (no hardcoded fallback)
-    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    const GROQ_API_KEY = process.env.GROQ_API_KEY?.trim();
 
     if (!GROQ_API_KEY) {
       console.error('GROQ_API_KEY is not defined in environment variables');
@@ -36,6 +36,9 @@ export async function POST(req: NextRequest) {
         }
       );
     }
+
+    // Debug: Log API key status (first 10 chars only for security)
+    console.log('GROQ_API_KEY loaded:', GROQ_API_KEY.substring(0, 10) + '...', 'Length:', GROQ_API_KEY.length);
 
     const groq = new Groq({
       apiKey: GROQ_API_KEY,

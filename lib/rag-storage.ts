@@ -9,6 +9,9 @@ const ragDataStore: Map<string, RAGDataEntry> = new Map();
 const vectorStore = getRAGVectorStore();
 
 // Initialize with some example data
+// Use fixed timestamp to avoid hydration issues
+const INITIAL_TIMESTAMP = 1700000000000; // Fixed timestamp for initial data
+
 if (ragDataStore.size === 0) {
   const initialData: RAGDataEntry[] = [
     {
@@ -18,8 +21,8 @@ if (ragDataStore.size === 0) {
       content:
         'AraQ is a leading AI technology company specializing in voice assistants and conversational AI solutions.',
       metadata: {},
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: INITIAL_TIMESTAMP,
+      updatedAt: INITIAL_TIMESTAMP,
     },
   ];
 
