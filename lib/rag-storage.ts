@@ -60,7 +60,10 @@ export class RAGStorage {
     return entry;
   }
 
-  static async updateEntry(id: string, input: Partial<RAGDataEntryInput>): Promise<RAGDataEntry | null> {
+  static async updateEntry(
+    id: string,
+    input: Partial<RAGDataEntryInput>
+  ): Promise<RAGDataEntry | null> {
     const existing = ragDataStore.get(id);
     if (!existing) {
       return null;
@@ -121,17 +124,17 @@ export class RAGStorage {
   static async getRelevantContext(query: string, k: number = 4): Promise<string> {
     // Ensure vector store is up to date
     await this.updateVectorStore();
-    
+
     // Search for similar documents
     const relevantDocs = await vectorStore.similaritySearch(query, k);
-    
+
     if (relevantDocs.length === 0) {
       return '';
     }
 
     // Format the relevant chunks
     const formatted = relevantDocs.map((doc) => {
-      let text = `**${doc.metadata.title}** (${doc.metadata.category})\n${doc.content}`;
+      const text = `**${doc.metadata.title}** (${doc.metadata.category})\n${doc.content}`;
       return text;
     });
 

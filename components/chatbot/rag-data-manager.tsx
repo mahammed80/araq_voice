@@ -33,18 +33,18 @@ export function RAGDataManager() {
       const url =
         category && category !== 'all' ? `/api/rag/data?category=${category}` : '/api/rag/data';
       const res = await fetch(url);
-      
+
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      
+
       const contentType = res.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const text = await res.text();
         console.error('Expected JSON but got:', text.substring(0, 200));
         throw new Error('Invalid response format');
       }
-      
+
       const data = await res.json();
       setEntries(data.entries || []);
     } catch (error) {
@@ -93,11 +93,11 @@ export function RAGDataManager() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        
+
         if (!res.ok) {
           const contentType = res.headers.get('content-type');
           let errorData = { error: 'Unknown error' };
-          
+
           if (contentType && contentType.includes('application/json')) {
             try {
               errorData = await res.json();
@@ -111,11 +111,13 @@ export function RAGDataManager() {
             console.error('Error response (HTML):', text.substring(0, 200));
             errorData = { error: `HTTP ${res.status}: ${res.statusText}` };
           }
-          
+
           console.error('Update error response:', errorData, 'Status:', res.status);
-          throw new Error(errorData.error || `Failed to update entry: ${res.status} ${res.statusText}`);
+          throw new Error(
+            errorData.error || `Failed to update entry: ${res.status} ${res.statusText}`
+          );
         }
-        
+
         const contentType = res.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
           const text = await res.text();
@@ -134,7 +136,7 @@ export function RAGDataManager() {
         if (!res.ok) {
           const contentType = res.headers.get('content-type');
           let errorData = { error: 'Unknown error' };
-          
+
           if (contentType && contentType.includes('application/json')) {
             try {
               errorData = await res.json();
@@ -148,8 +150,10 @@ export function RAGDataManager() {
             console.error('Error response (HTML):', text.substring(0, 200));
             errorData = { error: `HTTP ${res.status}: ${res.statusText}` };
           }
-          
-          throw new Error(errorData.error || `Failed to create entry: ${res.status} ${res.statusText}`);
+
+          throw new Error(
+            errorData.error || `Failed to create entry: ${res.status} ${res.statusText}`
+          );
         }
       }
 
@@ -174,16 +178,15 @@ export function RAGDataManager() {
         fetchEntries(selectedCategory === 'all' ? undefined : selectedCategory);
         return;
       }
-      
+
       const contentType = res.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const text = await res.text();
         console.error('Expected JSON but got:', text.substring(0, 200));
         throw new Error('Invalid response format');
       }
-      
+
       const { entry: serverEntry } = await res.json();
-      
       setEditingEntry(serverEntry);
       setFormData({
         category: serverEntry.category,
