@@ -16,7 +16,7 @@ class RecursiveCharacterTextSplitter {
 
     while (start < text.length) {
       let end = start + this.chunkSize;
-      
+
       // If not at the end, try to split at a sentence or paragraph boundary
       if (end < text.length) {
         // Try to find a good break point (newline, period, or space)
@@ -74,13 +74,13 @@ class SimpleEmbeddings {
     // In production, use proper embeddings (OpenAI, Cohere, etc.)
     const words = text.toLowerCase().split(/\s+/);
     const vector = new Array(384).fill(0); // 384 dimensions like MiniLM
-    
-    words.forEach((word, i) => {
+
+    words.forEach((word) => {
       const hash = this.simpleHash(word);
       const index = hash % 384;
       vector[index] = (vector[index] || 0) + 1 / (words.length || 1);
     });
-    
+
     // Normalize
     const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
     return magnitude > 0 ? vector.map((val) => val / magnitude) : vector;
@@ -124,23 +124,22 @@ class RAGVectorStore {
         try {
           // Combine title and content
           const fullText = `${entry.title}\n\n${entry.content}`;
-          
+
           if (!fullText.trim()) {
             console.warn(`Skipping empty entry: ${entry.id}`);
             continue;
           }
-          
+
           // Split into chunks
           const chunks = await this.textSplitter.splitText(fullText);
-          
+
           if (chunks.length === 0) {
             console.warn(`No chunks created for entry: ${entry.id}`);
             continue;
           }
-          
+
           // Create embeddings for each chunk
           const chunkEmbeddings = await this.embeddings.embedDocuments(chunks);
-          
           // Create vector documents
           chunks.forEach((chunk, index) => {
             if (chunkEmbeddings[index] && chunkEmbeddings[index].length > 0) {
@@ -163,7 +162,9 @@ class RAGVectorStore {
         }
       }
 
-      console.log(`Vector store updated: ${this.documents.length} chunks from ${entries.length} entries`);
+      console.log(
+        `Vector store updated: ${this.documents.length} chunks from ${entries.length} entries`
+      );
     } catch (error) {
       console.error('Error in addEntries:', error);
       throw error;
@@ -233,4 +234,3 @@ export function getRAGVectorStore(): RAGVectorStore {
   }
   return vectorStoreInstance;
 }
-
