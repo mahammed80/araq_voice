@@ -12,9 +12,10 @@ interface ChatSettingsProps {
 
 const MODELS = [
   { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8B Instant' },
-  { value: 'llama-3.1-70b-versatile', label: 'Llama 3.1 70B Versatile' },
-  { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B Versatile' },
-  { value: 'mixtral-8x7b-32768', label: 'Mixtral 8x7B' },
+  { value: 'meta-llama/llama-4-maverick-17b-128e-instruct', label: 'Llama 4 Maverick 17B (128e)' },
+  { value: 'meta-llama/llama-4-scout-17b-16e-instruct', label: 'Llama 4 Scout 17B (16e)' },
+  { value: 'moonshotai/kimi-k2-instruct-0905', label: 'Kimi K2 Instruct' },
+  { value: 'qwen/qwen3-32b', label: 'Qwen 3 32B' },
 ];
 
 export function ChatSettings({ settings, onSettingsChange }: ChatSettingsProps) {
