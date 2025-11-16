@@ -1,12 +1,13 @@
 import { NextRequest } from 'next/server';
 import { Groq } from 'groq-sdk';
 import { RAGStorage } from '@/lib/rag-storage';
+import { systemPromptsStorage } from '@/lib/system-prompts-storage';
 
 // Note: Using Node.js runtime as Groq SDK requires Node.js APIs
 export const runtime = 'nodejs';
 
-// Default Arabic system prompt for Saudi customer support
-const DEFAULT_ARABIC_SYSTEM_PROMPT = `أنت مساعد ذكي متخصص في خدمة عملاء سعودية تعمل لصالح شركة عرق (AraQ).
+// Fallback default Arabic system prompt (used only if no stored prompts exist)
+const FALLBACK_DEFAULT_ARABIC_SYSTEM_PROMPT = `أنت مساعد ذكي متخصص في خدمة عملاء سعودية تعمل لصالح شركة عرق (AraQ).
 
 عن الشركة:
 الشركة التي أنت متصل بها هي عرق (AraQ)، وهي شركة تقنية رائدة في مجال تقنيات الذكاء الاصطناعي، وتتخصص في مجالات مساعدات الصوت والتحديثات الذكية للواجهات النصية في الهواتف وغيرها من التطبيقات. نحن نقدم حلول ذكاء اصطناعي متقدمة للعملاء في المملكة العربية السعودية.
@@ -124,8 +125,17 @@ export async function POST(req: NextRequest) {
       console.log('RAG data disabled by user setting');
     }
 
+    // Get system prompt - use provided one, or default from storage, or fallback
+    let systemPromptToUse = system_prompt;
+    
+    if (!systemPromptToUse) {
+      // Try to get default chat prompt from storage
+      const defaultChatPrompt = systemPromptsStorage.getDefaultPrompt('chat');
+      systemPromptToUse = defaultChatPrompt?.prompt || FALLBACK_DEFAULT_ARABIC_SYSTEM_PROMPT;
+    }
+
     // Build system prompt with RAG data
-    let finalSystemPrompt = system_prompt || DEFAULT_ARABIC_SYSTEM_PROMPT;
+    let finalSystemPrompt = systemPromptToUse;
 
     if (ragDataContext && ragDataContext.trim()) {
       finalSystemPrompt += `\n\n═══════════════════════════════════════════════════════════

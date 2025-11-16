@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# whatsapp
+.whatsapp-config.json
+.wppconnect-session/
+tokens/

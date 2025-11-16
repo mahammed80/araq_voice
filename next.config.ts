@@ -11,11 +11,26 @@ const nextConfig: NextConfig = {
         fs: false,
         net: false,
         tls: false,
+        electron: false,
+      };
+    } else {
+      // For client-side, also exclude electron
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        electron: false,
       };
     }
     return config;
   },
-  serverExternalPackages: ['groq-sdk', 'node-fetch', 'formdata-node', 'agentkeepalive'],
+  serverExternalPackages: [
+    'groq-sdk',
+    'node-fetch',
+    'formdata-node',
+    'agentkeepalive',
+    '@wppconnect-team/wppconnect',
+    'got',
+    'puppeteer-core',
+  ],
 };
 
 export default nextConfig;
