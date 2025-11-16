@@ -11,9 +11,9 @@ export async function POST(
   try {
     const prompt = systemPromptsStorage.setDefaultPrompt(params.id);
     return NextResponse.json({ prompt });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error setting default prompt:', error);
-    if (error.message.includes('not found')) {
+    if (error instanceof Error && error.message.includes('not found')) {
       return NextResponse.json(
         { error: error.message },
         { status: 404 }

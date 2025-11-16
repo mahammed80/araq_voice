@@ -1,6 +1,5 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import { ChatMessage } from './chatbot';
 
 interface ChatMessagesProps {

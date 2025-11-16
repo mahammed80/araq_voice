@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/livekit/button';
 import { X, CheckCircle, WarningCircle } from '@phosphor-icons/react/dist/ssr';
 
@@ -381,16 +382,19 @@ export function WhatsAppSettings({ isOpen, onClose }: WhatsAppSettingsProps) {
                 {qrCode ? (
                   <div className="flex flex-col items-center justify-center gap-3">
                     <div className="bg-white p-4 rounded-lg border-2 border-primary/20 shadow-lg">
-                      <img
+                      <Image
                         src={qrCode}
                         alt="WhatsApp QR Code"
-                        className="w-64 h-64 object-contain"
+                        width={256}
+                        height={256}
+                        className="object-contain"
                         style={{ imageRendering: 'crisp-edges' }}
                         onLoad={() => console.log('✅ QR Code image loaded successfully')}
                         onError={(e) => {
                           console.error('❌ QR Code image failed to load:', e);
                           setQrCode(null);
                         }}
+                        unoptimized
                       />
                     </div>
                     <p className="text-muted-foreground text-xs text-center max-w-md">

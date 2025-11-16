@@ -35,7 +35,13 @@ export async function PUT(
     const body = await req.json();
     const { name, description, prompt, type, isDefault } = body;
 
-    const updates: any = {};
+    const updates: Partial<{
+      name: string;
+      description: string;
+      prompt: string;
+      type: 'chat' | 'whatsapp' | 'general';
+      isDefault: boolean;
+    }> = {};
     if (name !== undefined) updates.name = name;
     if (description !== undefined) updates.description = description;
     if (prompt !== undefined) updates.prompt = prompt;
@@ -52,9 +58,9 @@ export async function PUT(
 
     const updatedPrompt = systemPromptsStorage.updatePrompt(params.id, updates);
     return NextResponse.json({ prompt: updatedPrompt });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating system prompt:', error);
-    if (error.message.includes('not found')) {
+    if (error instanceof Error && error.message.includes('not found')) {
       return NextResponse.json(
         { error: error.message },
         { status: 404 }
@@ -81,9 +87,9 @@ export async function DELETE(
       );
     }
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting system prompt:', error);
-    if (error.message.includes('Cannot delete default')) {
+    if (error instanceof Error && error.message.includes('Cannot delete default')) {
       return NextResponse.json(
         { error: error.message },
         { status: 400 }

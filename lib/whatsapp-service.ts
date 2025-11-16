@@ -58,7 +58,7 @@ export async function connectWhatsApp(): Promise<{ success: boolean; qrCode?: st
     
     whatsappClient = await create({
       session: 'whatsapp-session',
-      catchQR: (base64Qr, asciiQR) => {
+      catchQR: (base64Qr) => {
         console.log('catchQR callback triggered - QR code generation started');
         // Ensure QR code has proper data URL format
         if (base64Qr) {
@@ -132,7 +132,13 @@ export async function connectWhatsApp(): Promise<{ success: boolean; qrCode?: st
       }
 
       // Ignore group messages using chat object if available
-      if ((message as any).chat?.isGroup) {
+      interface MessageWithChat {
+        chat?: {
+          isGroup?: boolean;
+        };
+      }
+      const messageWithChat = message as MessageWithChat;
+      if (messageWithChat.chat?.isGroup) {
         return;
       }
 
